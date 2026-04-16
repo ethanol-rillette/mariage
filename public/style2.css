@@ -1,0 +1,25 @@
+body {
+  margin: 0;
+  padding: 0;
+
+  background-image: url('last_background.png');
+  background-size: contain;        /* Remplit tout l’écran */
+  background-position: center;   /* Centré */
+  background-repeat: no-repeat;  /* Pas de répétition */
+  height: 100vh;
+}
+
+#lastCapture {
+  display: flex;              /* active flexbox */
+  justify-content: center;    /* centre horizontalement */
+  align-items: center;        /* centre verticalement */
+  height: 100vh;               /* prend 80% de la hauteur de la fenêtre */
+  margin: 0 auto;             /* centrage horizontal au cas où */
+}
+#lastCapture img,
+#lastCapture video {
+  max-width: 100%;            /* pas de débordement horizontal */
+  max-height: 100%;           /* pas de débordement vertical */
+  border: 2px solid #333;
+  border-radius: 10px;
+}

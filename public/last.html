@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Dernière capture</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style2.css">
+</head>
+<body>
+
+<div id="lastCapture"></div>
+
+<script>
+let lastId=null;
+
+async function loadLastCapture(){
+  try{
+    const res=await fetch('/last');
+    const data=await res.json();
+    const container=document.getElementById('lastCapture');
+    if(!data){ container.innerHTML='<p>Aucune capture disponible</p>'; return; }
+    if(data._id===lastId) return;
+    lastId=data._id;
+    if(data.type==='photo') container.innerHTML=`<img src="${data.content}" width="400"/>`;
+    else if(data.type==='video') container.innerHTML=`<video src="${data.content}" width="400" autoplay loop muted></video>`;
+  }catch(err){ console.error('Erreur chargement :',err); }
+}
+
+loadLastCapture();
+setInterval(loadLastCapture,3000);
+</script>
+
+</body>
+</html>

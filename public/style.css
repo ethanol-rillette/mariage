@@ -1,0 +1,60 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family:cursive;
+  font-style: italic;
+  text-align: center;
+
+  background-image: url('fond.png');
+  background-size: contain;        /* Remplit tout l’écran */
+  background-position: center;   /* Centré */
+  background-repeat: no-repeat;  /* Pas de répétition */
+  height: 100vh;
+}
+
+video {
+  border-radius: 30px;
+  border: 2px solid #333;
+  width: 300px;
+}
+
+img {
+  border-radius: 30px;
+  border: 2px solid #333;
+  margin: 5px;
+}
+
+button, input {
+  font-family:cursive;
+  font-style: italic;
+  background: #d6ccba;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.controls {
+  display: flex;
+  justify-content: center !important;
+  align-items: center;
+  gap: 20px;
+
+  width: 100%;
+  margin: 20px auto;
+}
+
+.left,
+.right {
+  flex: 0 0 auto !important;  /* empêche étirement */
+  width: auto !important;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+#importBtn {
+  margin: 10px;
+}
