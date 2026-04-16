@@ -93,9 +93,18 @@ app.post('/upload', async (req, res) => {
       emailSent: buffer.length <= MAX_EMAIL_SIZE
     });
 
+
+    // ajout temporaire
+    console.log("UPLOAD HIT");
+    console.log(req.body);
+
   } catch (err) {
     console.error("UPLOAD ERROR:", err);
     res.status(500).send({ error: err.message });
+
+    
+    // ajout temporaire
+    console.error("FULL ERROR:", err);
   }
 });
 
