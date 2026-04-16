@@ -111,5 +111,5 @@ app.get('/last', async (req, res) => {
 });
 
 // --- Démarrage serveur ---
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Serveur lancé sur http://localhost:${PORT}`));
+const PORT = process.env.PORT;
+app.listen(PORT, () => console.log(`Serveur lancé sur port ${PORT}`));
