@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Photothèque</title>
+
 <link rel="stylesheet" href="style.css">
 </head>
 
@@ -13,12 +14,11 @@
 
 <!-- CAMERA -->
 <div class="preview-box">
-  <video id="video" autoplay muted playsinline></video>
+  <video id="video" autoplay playsinline muted></video>
 </div>
 
-<!-- CONTROLS -->
+<!-- CONTROLS GRID -->
 <div class="controls">
-
   <div class="controls-grid">
 
     <button class="btn switch" onclick="switchCamera()">🔄 Switch</button>
@@ -30,19 +30,18 @@
     <div id="recordingIndicator"></div>
 
   </div>
-
 </div>
 
 <!-- IMPORT -->
 <input type="file" id="fileInput" accept="image/*,video/*" hidden>
-<button id="importBtn">Importer</button>
+<button id="importBtn" onclick="fileInput.click()">Importer</button>
 
 <!-- PREVIEW -->
 <div id="previewContainer" style="display:none;">
   <div id="preview"></div>
 </div>
 
-<!-- ACTIONS -->
+<!-- ACTION BUTTONS -->
 <button id="downloadBtn">Télécharger</button>
 <button id="uploadBtn">Envoyer à la base</button>
 
@@ -55,199 +54,7 @@
 <input type="hidden" id="uploader" value="Nathan">
 
 <script>
-let stream;
-let mediaRecorder;
-let chunks = [];
-let lastData = null;
-let lastType = null;
-
-let currentFacingMode = "user"; // front camera par défaut
-
-const video = document.getElementById('video');
-
-// 🎥 CAMERA START (avec switch front/back)
-async function startCamera() {
-  if (stream) {
-    stream.getTracks().forEach(track => track.stop());
-  }
-
-  stream = await navigator.mediaDevices.getUserMedia({
-    video: {
-      facingMode: currentFacingMode,
-      width: { ideal: 1280 },
-      height: { ideal: 720 }
-    },
-    audio: true
-  });
-
-  video.srcObject = stream;
-
-  video.onloadedmetadata = () => {
-    let videoW = video.videoWidth;
-    let videoH = video.videoHeight;
-
-    const maxW = Math.min(window.innerWidth * 0.7, 400);
-    const ratio = videoH / videoW;
-
-    const finalW = maxW;
-    const finalH = maxW * ratio;
-
-    const box = document.querySelector('.preview-box');
-
-    box.style.width = finalW + "px";
-    box.style.height = finalH + "px";
-  };
-}
-
-// 🔄 SWITCH CAMERA
-async function switchCamera() {
-  currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
-  await startCamera();
-}
-
-// 🚀 START CAMERA INIT
-startCamera().catch(err => {
-  alert("Erreur caméra : " + err.message);
-});
-
-
-// 🔘 BOUTONS
-document.addEventListener('DOMContentLoaded', hideButtons);
-
-function showButtons(){
-  downloadBtn.style.display = 'inline-block';
-  uploadBtn.style.display = 'inline-block';
-}
-
-function hideButtons(){
-  downloadBtn.style.display = 'none';
-  uploadBtn.style.display = 'none';
-}
-
-
-// 👁️ PREVIEW
-function showPreview(){
-  if(lastType === 'photo'){
-    preview.innerHTML = `<img src="${lastData}">`;
-  } else {
-    preview.innerHTML = `<video src="${lastData}" autoplay loop muted controls></video>`;
-  }
-
-  previewContainer.style.display = 'block';
-  showButtons();
-}
-
-
-// 📸 PHOTO
-function takePhoto(){
-  const ctx = canvas.getContext('2d');
-
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-
-  ctx.drawImage(video, 0, 0);
-
-  lastData = canvas.toDataURL('image/png');
-  lastType = 'photo';
-
-  showPreview();
-}
-
-
-// 🎥 VIDEO
-function startRecording(){
-  chunks = [];
-  mediaRecorder = new MediaRecorder(stream);
-
-  mediaRecorder.ondataavailable = e => {
-    if(e.data.size > 0) chunks.push(e.data);
-  };
-
-  mediaRecorder.start();
-  recordingIndicator.style.display = 'block';
-}
-
-function stopRecording(){
-  mediaRecorder.stop();
-
-  mediaRecorder.onstop = () => {
-    const blob = new Blob(chunks, { type:'video/webm' });
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      lastData = reader.result;
-      lastType = 'video';
-      showPreview();
-    };
-
-    reader.readAsDataURL(blob);
-    recordingIndicator.style.display = 'none';
-  };
-}
-
-
-// 📥 IMPORT
-importBtn.onclick = () => fileInput.click();
-
-fileInput.onchange = e => {
-  const file = e.target.files[0];
-  if(!file) return;
-
-  const reader = new FileReader();
-
-  reader.onload = () => {
-    lastData = reader.result;
-    lastType = file.type.startsWith('image') ? 'photo' : 'video';
-    showPreview();
-  };
-
-  reader.readAsDataURL(file);
-};
-
-
-// ⬇️ DOWNLOAD
-downloadBtn.onclick = () => {
-  const a = document.createElement('a');
-  a.href = lastData;
-  a.download = lastType === 'photo'
-    ? `photo_${Date.now()}.png`
-    : `video_${Date.now()}.webm`;
-
-  a.click();
-};
-
-
-// ☁️ UPLOAD
-uploadBtn.onclick = async () => {
-  if(!lastData){
-    alert("Aucune capture !");
-    return;
-  }
-
-  try {
-    const res = await fetch('/upload', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        content: lastData,
-        type: lastType,
-        uploader: document.getElementById('uploader').value
-      })
-    });
-
-    if(res.ok){
-      alert("Envoyé !");
-      hideButtons();
-      previewContainer.style.display = 'none';
-      preview.innerHTML = '';
-    } else {
-      alert("Erreur upload");
-    }
-
-  } catch(err){
-    alert("Erreur serveur");
-  }
-};
+// ⚠️ ICI TU COLLES TON JS COMPLET (celui que je t’ai donné juste avant)
 </script>
 
 </body>
