@@ -116,7 +116,6 @@ button {
 /* ACTION BUTTONS */
 #downloadBtn,
 #uploadBtn {
-  display: none;
   margin: 20px auto;
   width: 25%;
 }

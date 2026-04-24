@@ -54,21 +54,17 @@
 <input type="hidden" id="uploader" value="Nathan">
 
 <script>
-
 let stream;
 let mediaRecorder;
 let chunks = [];
 let lastData = null;
 let lastType = null;
 
-let currentFacingMode = "user";
+let currentFacingMode = "user"; // front par défaut
 
 const video = document.getElementById("video");
 
-
-// =======================
-// CAMERA
-// =======================
+// 🎥 START CAMERA
 async function startCamera() {
   if (stream) {
     stream.getTracks().forEach(track => track.stop());
@@ -98,10 +94,7 @@ async function startCamera() {
   };
 }
 
-
-// =======================
-// MIRROR LOGIC
-// =======================
+// 🔄 MIRROR LOGIC (IMPORTANT)
 function applyMirror() {
   if (currentFacingMode === "user") {
     video.style.transform = "scaleX(-1)";
@@ -110,10 +103,7 @@ function applyMirror() {
   }
 }
 
-
-// =======================
-// SWITCH CAMERA
-// =======================
+// 🔄 SWITCH CAMERA
 async function switchCamera() {
   currentFacingMode =
     currentFacingMode === "user" ? "environment" : "user";
@@ -121,18 +111,13 @@ async function switchCamera() {
   await startCamera();
 }
 
-
-// =======================
-// INIT CAMERA
-// =======================
+// 🚀 INIT CAMERA
 startCamera().catch(err => {
   alert("Erreur caméra : " + err.message);
 });
 
 
-// =======================
-// PHOTO
-// =======================
+// 📸 PHOTO
 function takePhoto() {
   const canvas = document.getElementById("canvas");
   const ctx = canvas.getContext("2d");
@@ -140,14 +125,7 @@ function takePhoto() {
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
 
-  // miroir si front camera (Snapchat style)
-  if (currentFacingMode === "user") {
-    ctx.translate(canvas.width, 0);
-    ctx.scale(-1, 1);
-  }
-
   ctx.drawImage(video, 0, 0);
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
 
   lastData = canvas.toDataURL("image/png");
   lastType = "photo";
@@ -156,9 +134,7 @@ function takePhoto() {
 }
 
 
-// =======================
-// VIDEO RECORD
-// =======================
+// 🎥 VIDEO RECORD
 function startRecording() {
   chunks = [];
   mediaRecorder = new MediaRecorder(stream);
@@ -191,9 +167,7 @@ function stopRecording() {
 }
 
 
-// =======================
-// PREVIEW
-// =======================
+// 👁️ PREVIEW
 function showPreview() {
   const preview = document.getElementById("preview");
   const container = document.getElementById("previewContainer");
@@ -205,24 +179,7 @@ function showPreview() {
   }
 
   container.style.display = "block";
-
-  showButtons();
 }
-
-
-// =======================
-// BUTTONS
-// =======================
-function showButtons() {
-  document.getElementById("downloadBtn").style.display = "block";
-  document.getElementById("uploadBtn").style.display = "block";
-}
-
-function hideButtons() {
-  document.getElementById("downloadBtn").style.display = "none";
-  document.getElementById("uploadBtn").style.display = "none";
-}
-
 </script>
 
 </body>
