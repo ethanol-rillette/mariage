@@ -15,6 +15,7 @@ body {
 .preview-box {
   display: inline-block;
   margin: 20px auto;
+  position: relative;
   overflow: hidden;
   border-radius: 30px;
   border: 2px solid #333;

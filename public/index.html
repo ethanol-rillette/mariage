@@ -68,22 +68,20 @@ navigator.mediaDevices.getUserMedia({
   video.srcObject = s;
 
   video.onloadedmetadata = () => {
-    let w = video.videoWidth;
-    let h = video.videoHeight;
+    let videoW = video.videoWidth;
+    let videoH = video.videoHeight;
 
-    const maxW = Math.min(
-      window.innerWidth * 0.8, // 📱 80% écran
-      400                      // 💻 limite desktop
-    );
+    const maxW = Math.min(window.innerWidth * 0.8, 400);
 
-    if (w > maxW) {
-      const ratio = maxW / w;
-      w *= ratio;
-      h *= ratio;
-    }
+    const ratio = videoH / videoW;
 
-    box.style.width = w + "px";
-    box.style.height = h + "px";
+    const finalW = maxW;
+    const finalH = maxW * ratio;
+
+    const box = document.querySelector('.preview-box');
+
+    box.style.width = finalW + "px";
+    box.style.height = finalH + "px";
   };
 })
 .catch(err => {
