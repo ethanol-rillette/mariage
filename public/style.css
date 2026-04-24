@@ -6,38 +6,41 @@ body {
   background-image: url('fond.png');
   background-repeat: repeat-y;
   background-position: top center;
-
   background-size: 100%;
 
   min-height: 100vh;
 }
 
-/* CAMERA */
+/* CAMERA BOX (adaptatif réel) */
 .preview-box {
-  width: 90%;
-  max-width: 320px;
-  aspect-ratio: 4/3;
+  display: inline-block;
   margin: 20px auto;
   overflow: hidden;
   border-radius: 30px;
   border: 2px solid #333;
   background: black;
+
+  max-width: 400px;
+  width: 100%;
 }
 
+/* VIDEO (plein cadre propre) */
 #video {
+  display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover; /* 🔥 supprime les bandes */
   transform: scaleX(-1);
+  
 }
 
 /* PREVIEW */
 #preview img,
-#preview video{
+#preview video {
   transform: scaleX(-1);
-  width: 100%;
-  max-width: 320px;
-  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  border-radius: 30px;
   border: 2px solid #333;
 }
 
@@ -75,16 +78,29 @@ button {
   display: none;
 }
 
-/* BUTTONS INIT STATE */
+/* ACTION BUTTONS */
 #downloadBtn,
 #uploadBtn {
   display: none;
   margin: 20px auto;
 }
 
-/* MOBILE */
+/* 📱 MOBILE OPTIMISÉ */
 @media (max-width: 600px) {
-  h1 { font-size: 20px; }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  /* caméra prend presque tout l'écran */
+  .preview-box {
+    width: 95vw;
+  }
+
+  #video {
+    width: 100%;
+    height: auto;
+  }
 
   .controls {
     flex-direction: column;
@@ -93,5 +109,11 @@ button {
 
   button {
     width: 80%;
+    max-width: 300px;
+  }
+
+  #preview img,
+  #preview video {
+    width: 95%;
   }
 }
