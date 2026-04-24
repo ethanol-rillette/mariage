@@ -60,7 +60,7 @@ body {
   height: 100%;
 }
 
-#preview image{
+#preview img{
   transform: scaleX(-1);
 }
 
@@ -141,7 +141,7 @@ button {
 
   /* caméra prend presque tout l'écran */
   .preview-box,
-  #preview {
+  #previewContainer {
     width: 95vw;
   }
 
@@ -157,10 +157,5 @@ button {
 
   button {
     width: 10%;
-  }
-
-  #preview img,
-  #preview video {
-    width: 95%;
   }
 }
