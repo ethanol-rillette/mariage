@@ -71,7 +71,10 @@ navigator.mediaDevices.getUserMedia({
     let w = video.videoWidth;
     let h = video.videoHeight;
 
-    const maxW = Math.min(window.innerWidth * 0.95, 400);
+    const maxW = Math.min(
+      window.innerWidth * 0.8, // 📱 80% écran
+      400                      // 💻 limite desktop
+    );
 
     if (w > maxW) {
       const ratio = maxW / w;

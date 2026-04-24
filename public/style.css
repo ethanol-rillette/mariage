@@ -94,7 +94,6 @@ button {
 
   /* caméra prend presque tout l'écran */
   .preview-box {
-    max-width: 300px;
     width: 95vw;
   }
 
@@ -115,7 +114,6 @@ button {
 
   #preview img,
   #preview video {
-    max-width: 300px;
     width: 95%;
   }
 }
