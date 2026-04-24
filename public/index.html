@@ -54,7 +54,132 @@
 <input type="hidden" id="uploader" value="Nathan">
 
 <script>
-// ⚠️ ICI TU COLLES TON JS COMPLET (celui que je t’ai donné juste avant)
+let stream;
+let mediaRecorder;
+let chunks = [];
+let lastData = null;
+let lastType = null;
+
+let currentFacingMode = "user"; // front par défaut
+
+const video = document.getElementById("video");
+
+// 🎥 START CAMERA
+async function startCamera() {
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+  }
+
+  stream = await navigator.mediaDevices.getUserMedia({
+    video: {
+      facingMode: currentFacingMode,
+      width: { ideal: 1280 },
+      height: { ideal: 720 }
+    },
+    audio: true
+  });
+
+  video.srcObject = stream;
+
+  applyMirror();
+
+  video.onloadedmetadata = () => {
+    const maxW = Math.min(window.innerWidth * 0.7, 400);
+    const ratio = video.videoHeight / video.videoWidth;
+
+    const box = document.querySelector(".preview-box");
+
+    box.style.width = maxW + "px";
+    box.style.height = maxW * ratio + "px";
+  };
+}
+
+// 🔄 MIRROR LOGIC (IMPORTANT)
+function applyMirror() {
+  if (currentFacingMode === "user") {
+    video.style.transform = "scaleX(-1)";
+  } else {
+    video.style.transform = "scaleX(1)";
+  }
+}
+
+// 🔄 SWITCH CAMERA
+async function switchCamera() {
+  currentFacingMode =
+    currentFacingMode === "user" ? "environment" : "user";
+
+  await startCamera();
+}
+
+// 🚀 INIT CAMERA
+startCamera().catch(err => {
+  alert("Erreur caméra : " + err.message);
+});
+
+
+// 📸 PHOTO
+function takePhoto() {
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  ctx.drawImage(video, 0, 0);
+
+  lastData = canvas.toDataURL("image/png");
+  lastType = "photo";
+
+  showPreview();
+}
+
+
+// 🎥 VIDEO RECORD
+function startRecording() {
+  chunks = [];
+  mediaRecorder = new MediaRecorder(stream);
+
+  mediaRecorder.ondataavailable = e => {
+    if (e.data.size > 0) chunks.push(e.data);
+  };
+
+  mediaRecorder.start();
+  document.getElementById("recordingIndicator").style.display = "block";
+}
+
+function stopRecording() {
+  mediaRecorder.stop();
+
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(chunks, { type: "video/webm" });
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      lastData = reader.result;
+      lastType = "video";
+      showPreview();
+    };
+
+    reader.readAsDataURL(blob);
+
+    document.getElementById("recordingIndicator").style.display = "none";
+  };
+}
+
+
+// 👁️ PREVIEW
+function showPreview() {
+  const preview = document.getElementById("preview");
+  const container = document.getElementById("previewContainer");
+
+  if (lastType === "photo") {
+    preview.innerHTML = `<img src="${lastData}">`;
+  } else {
+    preview.innerHTML = `<video src="${lastData}" autoplay loop muted playsinline></video>`;
+  }
+
+  container.style.display = "block";
+}
 </script>
 
 </body>
