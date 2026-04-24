@@ -18,13 +18,19 @@
 
 <!-- CONTROLS -->
 <div class="controls">
-  <button onclick="takePhoto()">Photo 📸</button>
 
-  <div class="video-controls">
-    <button onclick="startRecording()">ON 🎥</button>
-    <button onclick="stopRecording()">OFF ⏹️</button>
+  <div class="controls-grid">
+
+    <button class="btn switch" onclick="switchCamera()">🔄 Switch</button>
+    <button class="btn photo" onclick="takePhoto()">📸 Photo</button>
+
+    <button class="btn on" onclick="startRecording()">ON 🎥</button>
+    <button class="btn off" onclick="stopRecording()">OFF ⏹️</button>
+
     <div id="recordingIndicator"></div>
+
   </div>
+
 </div>
 
 <!-- IMPORT -->
@@ -55,24 +61,32 @@ let chunks = [];
 let lastData = null;
 let lastType = null;
 
-const video = document.getElementById('video');
-const box = document.querySelector('.preview-box');
+let currentFacingMode = "user"; // front camera par défaut
 
-// 🎥 CAMERA + ADAPTATION TAILLE
-navigator.mediaDevices.getUserMedia({
-  video: { width: { ideal: 1280 }, height: { ideal: 720 } },
-  audio: true
-})
-.then(s => {
-  stream = s;
-  video.srcObject = s;
+const video = document.getElementById('video');
+
+// 🎥 CAMERA START (avec switch front/back)
+async function startCamera() {
+  if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+  }
+
+  stream = await navigator.mediaDevices.getUserMedia({
+    video: {
+      facingMode: currentFacingMode,
+      width: { ideal: 1280 },
+      height: { ideal: 720 }
+    },
+    audio: true
+  });
+
+  video.srcObject = stream;
 
   video.onloadedmetadata = () => {
     let videoW = video.videoWidth;
     let videoH = video.videoHeight;
 
     const maxW = Math.min(window.innerWidth * 0.7, 400);
-
     const ratio = videoH / videoW;
 
     const finalW = maxW;
@@ -83,10 +97,19 @@ navigator.mediaDevices.getUserMedia({
     box.style.width = finalW + "px";
     box.style.height = finalH + "px";
   };
-})
-.catch(err => {
+}
+
+// 🔄 SWITCH CAMERA
+async function switchCamera() {
+  currentFacingMode = currentFacingMode === "user" ? "environment" : "user";
+  await startCamera();
+}
+
+// 🚀 START CAMERA INIT
+startCamera().catch(err => {
   alert("Erreur caméra : " + err.message);
 });
+
 
 // 🔘 BOUTONS
 document.addEventListener('DOMContentLoaded', hideButtons);
@@ -101,6 +124,7 @@ function hideButtons(){
   uploadBtn.style.display = 'none';
 }
 
+
 // 👁️ PREVIEW
 function showPreview(){
   if(lastType === 'photo'){
@@ -112,6 +136,7 @@ function showPreview(){
   previewContainer.style.display = 'block';
   showButtons();
 }
+
 
 // 📸 PHOTO
 function takePhoto(){
@@ -127,6 +152,7 @@ function takePhoto(){
 
   showPreview();
 }
+
 
 // 🎥 VIDEO
 function startRecording(){
@@ -159,6 +185,7 @@ function stopRecording(){
   };
 }
 
+
 // 📥 IMPORT
 importBtn.onclick = () => fileInput.click();
 
@@ -177,6 +204,7 @@ fileInput.onchange = e => {
   reader.readAsDataURL(file);
 };
 
+
 // ⬇️ DOWNLOAD
 downloadBtn.onclick = () => {
   const a = document.createElement('a');
@@ -187,6 +215,7 @@ downloadBtn.onclick = () => {
 
   a.click();
 };
+
 
 // ☁️ UPLOAD
 uploadBtn.onclick = async () => {
