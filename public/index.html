@@ -2,70 +2,42 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Photothèque</title>
 <link rel="stylesheet" href="style.css">
-
-<style>
-#importBtn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  background: black;
-  color: white;
-  cursor: pointer;
-  font-size: 16px;
-}
-#importBtn:hover {
-  background: #333;
-}
-
-.controls {
-  display:flex;
-  justify-content:space-between;
-  width:300px;
-  margin:auto;
-}
-</style>
-
 </head>
 
 <body>
 
-<h1>Photothèque <br>Nathan & Faustine</h1>
+<h1>Photothèque<br>Nathan & Faustine</h1>
 
-<video id="video" autoplay></video>
-<br>
-
-<div class="controls">
-  <div class="left">
-    <button onclick="takePhoto()">Photo 📸</button>
-  </div>
-
-  <div class="right">
-    <div style="display:flex; align-items:center; gap:10px;">
-      <button onclick="startRecording()">ON 🎥</button>
-      <div id="recordingIndicator"
-           style="display:none;width:15px;height:15px;background:red;border-radius:50%;">
-      </div>
-    </div>
-    <button onclick="stopRecording()">OFF ⏹️</button>
-  </div>
+<div class="preview-box">
+  <video id="video" autoplay muted></video>
 </div>
 
-<!-- IMPORT CUSTOM -->
-<input type="file" id="fileInput" accept="image/*,video/*" style="display:none;">
+<div class="controls">
+
+  <button onclick="takePhoto()">Photo 📸</button>
+
+  <div class="video-controls">
+    <button onclick="startRecording()">ON 🎥</button>
+    <button onclick="stopRecording()">OFF ⏹️</button>
+    <div id="recordingIndicator"></div>
+  </div>
+
+</div>
+
+<input type="file" id="fileInput" hidden>
 <button id="importBtn">Importer</button>
 
-<br><br>
-
-<div id="previewContainer" style="display:none;">
+<div id="previewContainer">
   <div id="preview"></div>
 </div>
 
-<button id="downloadBtn" style="display:none;">Télécharger</button>
-<button id="uploadBtn" style="display:none;">Envoyer à la base</button>
+<button id="downloadBtn">Télécharger</button>
+<button id="uploadBtn">Envoyer à la base</button>
 
-<br><br>
+<br>
 
 <a href="last.html" target="_blank">Voir la dernière capture</a>
 
@@ -73,177 +45,128 @@
 <input type="hidden" id="uploader" value="Nathan">
 
 <script>
-let stream, mediaRecorder, recordedChunks=[], recordingTimeout;
-let lastCaptureData=null, lastCaptureType=null;
-
-const MAX_SIZE_MB=10;
-const MAX_VIDEO_DURATION=10;
+let stream, mediaRecorder, chunks = [];
+let lastData = null;
+let lastType = null;
 
 // CAMERA
-navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+navigator.mediaDevices.getUserMedia({ video:true, audio:true })
 .then(s => {
-  stream=s;
-  document.getElementById('video').srcObject=s;
-})
-.catch(err => alert('Erreur caméra : '+err));
+  stream = s;
+  video.srcObject = s;
+});
+
+// INIT BUTTONS (IMPORTANT)
+document.addEventListener('DOMContentLoaded', () => {
+  hideButtons();
+});
+
+// SHOW / HIDE BUTTONS
+function showButtons(){
+  downloadBtn.style.display = 'inline-block';
+  uploadBtn.style.display = 'inline-block';
+}
+
+function hideButtons(){
+  downloadBtn.style.display = 'none';
+  uploadBtn.style.display = 'none';
+}
 
 // PREVIEW
 function showPreview(){
-  const container=document.getElementById('previewContainer');
-  const preview=document.getElementById('preview');
+  const p = document.getElementById('preview');
 
-  if(lastCaptureType==='photo'){
-    preview.innerHTML=`<img src="${lastCaptureData}" width="300">`;
+  if(lastType === 'photo'){
+    p.innerHTML = `<img src="${lastData}">`;
   } else {
-    preview.innerHTML=`<video src="${lastCaptureData}" width="300" controls autoplay loop muted></video>`;
+    p.innerHTML = `<video src="${lastData}" autoplay loop muted controls></video>`;
   }
 
-  container.style.display='block';
-  document.getElementById('downloadBtn').style.display='inline-block';
-  document.getElementById('uploadBtn').style.display='inline-block';
+  previewContainer.style.display = 'block';
+  showButtons();
 }
 
 // PHOTO
 function takePhoto(){
-  const canvas=document.getElementById('canvas');
-  const video=document.getElementById('video');
+  const ctx = canvas.getContext('2d');
 
-  canvas.width=video.videoWidth;
-  canvas.height=video.videoHeight;
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
 
-  canvas.getContext('2d').drawImage(video,0,0);
+  ctx.drawImage(video,0,0);
 
-  lastCaptureData=canvas.toDataURL('image/png');
-  lastCaptureType='photo';
+  lastData = canvas.toDataURL('image/png');
+  lastType = 'photo';
 
   showPreview();
 }
 
 // VIDEO
 function startRecording(){
-  recordedChunks=[];
-  mediaRecorder=new MediaRecorder(stream);
+  chunks = [];
+  mediaRecorder = new MediaRecorder(stream);
 
-  mediaRecorder.ondataavailable=e=>{
-    if(e.data.size>0) recordedChunks.push(e.data);
-  };
-
+  mediaRecorder.ondataavailable = e => chunks.push(e.data);
   mediaRecorder.start();
-
-  document.getElementById('recordingIndicator').style.display='block';
-
-  recordingTimeout=setTimeout(()=>{
-    if(mediaRecorder.state==="recording"){
-      stopRecording();
-      alert("Vidéo arrêtée automatiquement");
-    }
-  }, MAX_VIDEO_DURATION*1000);
 }
 
 function stopRecording(){
-  clearTimeout(recordingTimeout);
-
   mediaRecorder.stop();
 
-  mediaRecorder.onstop=()=>{
-    const blob=new Blob(recordedChunks,{type:'video/webm'});
+  mediaRecorder.onstop = () => {
+    const blob = new Blob(chunks, {type:'video/webm'});
+    const reader = new FileReader();
 
-    if(blob.size>MAX_SIZE_MB*1024*1024){
-      alert("Vidéo trop lourde !");
-      document.getElementById('recordingIndicator').style.display='none';
-      return;
-    }
-
-    const reader=new FileReader();
-
-    reader.onloadend=()=>{
-      lastCaptureData=reader.result;
-      lastCaptureType='video';
+    reader.onload = () => {
+      lastData = reader.result;
+      lastType = 'video';
       showPreview();
     };
 
     reader.readAsDataURL(blob);
-
-    document.getElementById('recordingIndicator').style.display='none';
   };
 }
 
-// IMPORT BUTTON
-window.addEventListener('DOMContentLoaded',()=>{
-  document.getElementById('importBtn').onclick=()=>{
-    document.getElementById('fileInput').click();
-  };
-});
+// IMPORT
+importBtn.onclick = () => fileInput.click();
 
-// FILE IMPORT
-document.getElementById('fileInput').addEventListener('change',function(e){
-  const file=e.target.files[0];
-  if(!file) return;
+fileInput.onchange = e => {
+  const file = e.target.files[0];
+  const reader = new FileReader();
 
-  if(file.size>MAX_SIZE_MB*1024*1024){
-    alert("Fichier trop lourd !");
-    return;
-  }
-
-  const reader=new FileReader();
-
-  reader.onloadend=function(){
-    lastCaptureData=reader.result;
-    lastCaptureType=file.type.startsWith('image')?'photo':'video';
+  reader.onload = () => {
+    lastData = reader.result;
+    lastType = file.type.startsWith('image') ? 'photo' : 'video';
     showPreview();
   };
 
   reader.readAsDataURL(file);
-});
+};
 
 // DOWNLOAD
-document.getElementById('downloadBtn').onclick=()=>{
-  const link=document.createElement('a');
-  link.href=lastCaptureData;
-  link.download=lastCaptureType==='photo'
-    ? `photo_${Date.now()}.png`
-    : `video_${Date.now()}.webm`;
-
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+downloadBtn.onclick = () => {
+  const a = document.createElement('a');
+  a.href = lastData;
+  a.download = lastType === 'photo' ? 'photo.png' : 'video.webm';
+  a.click();
 };
 
 // UPLOAD
-document.getElementById('uploadBtn').onclick=async()=>{
-  const uploader=document.getElementById('uploader').value;
+uploadBtn.onclick = async () => {
+  await fetch('/upload', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      content:lastData,
+      type:lastType,
+      uploader:document.getElementById('uploader').value
+    })
+  });
 
-  if(!lastCaptureData){
-    alert("Aucune capture !");
-    return;
-  }
-
-  try{
-    const res=await fetch('/upload',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        content:lastCaptureData,
-        uploader,
-        type:lastCaptureType
-      })
-    });
-
-    if(res.ok){
-      alert("Envoyé à la base !");
-
-      document.getElementById('downloadBtn').style.display='none';
-      document.getElementById('uploadBtn').style.display='none';
-      document.getElementById('previewContainer').style.display='none';
-      document.getElementById('preview').innerHTML='';
-    } else {
-      alert("Erreur upload !");
-    }
-
-  } catch(err){
-    console.error(err);
-    alert("Erreur serveur !");
-  }
+  alert("Envoyé !");
+  hideButtons();
+  previewContainer.style.display = 'none';
+  preview.innerHTML = '';
 };
 </script>
 

@@ -7,15 +7,20 @@ body {
   background-position: center;   /* Centré */
   background-repeat: no-repeat;  /* Pas de répétition */
   height: 100vh;
+
+  background-size: 100%;
 }
 
 #lastCapture {
+  width: 90%;
+  max-width: 320px;
   display: flex;              /* active flexbox */
   justify-content: center;    /* centre horizontalement */
   align-items: center;        /* centre verticalement */
   height: 100vh;               /* prend 80% de la hauteur de la fenêtre */
   margin: 0 auto;             /* centrage horizontal au cas où */
 }
+
 #lastCapture img,
 #lastCapture video {
   max-width: 100%;            /* pas de débordement horizontal */

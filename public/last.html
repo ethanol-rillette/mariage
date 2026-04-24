@@ -2,32 +2,38 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dernière capture</title>
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="style2.css">
+
 </head>
+
 <body>
 
 <div id="lastCapture"></div>
 
 <script>
-let lastId=null;
+let lastId;
 
-async function loadLastCapture(){
-  try{
-    const res=await fetch('/last');
-    const data=await res.json();
-    const container=document.getElementById('lastCapture');
-    if(!data){ container.innerHTML='<p>Aucune capture disponible</p>'; return; }
-    if(data._id===lastId) return;
-    lastId=data._id;
-    if(data.type==='photo') container.innerHTML=`<img src="${data.content}" width="400"/>`;
-    else if(data.type==='video') container.innerHTML=`<video src="${data.content}" width="400" autoplay loop muted></video>`;
-  }catch(err){ console.error('Erreur chargement :',err); }
+async function load(){
+  const res = await fetch('/last');
+  const data = await res.json();
+
+  if(!data) return;
+  if(data._id === lastId) return;
+
+  lastId = data._id;
+
+  if(data.type === 'photo'){
+    lastCapture.innerHTML = `<img src="${data.content}">`;
+  } else {
+    lastCapture.innerHTML = `<video src="${data.content}" autoplay loop muted></video>`;
+  }
 }
 
-loadLastCapture();
-setInterval(loadLastCapture,3000);
+load();
+setInterval(load,3000);
 </script>
 
 </body>

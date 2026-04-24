@@ -1,60 +1,97 @@
 body {
   margin: 0;
-  padding: 0;
-  font-family:cursive;
-  font-style: italic;
+  font-family: cursive;
   text-align: center;
 
   background-image: url('fond.png');
-  background-size: contain;        /* Remplit tout l’écran */
-  background-position: center;   /* Centré */
-  background-repeat: no-repeat;  /* Pas de répétition */
-  height: 100vh;
+  background-repeat: repeat-y;
+  background-position: top center;
+
+  background-size: 100%;
+
+  min-height: 100vh;
 }
 
-video {
+/* CAMERA */
+.preview-box {
+  width: 90%;
+  max-width: 320px;
+  aspect-ratio: 4/3;
+  margin: 20px auto;
+  overflow: hidden;
   border-radius: 30px;
   border: 2px solid #333;
-  width: 300px;
+  background: black;
 }
 
-img {
-  border-radius: 30px;
+#video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: scaleX(-1);
+}
+
+/* PREVIEW */
+#preview img,
+#preview video{
+  transform: scaleX(-1);
+  width: 100%;
+  max-width: 320px;
+  border-radius: 10px;
   border: 2px solid #333;
-  margin: 5px;
 }
 
-button, input {
-  font-family:cursive;
-  font-style: italic;
+/* CONTROLS */
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin: 20px;
+}
+
+/* BUTTONS */
+button {
+  font-family: cursive;
   background: #d6ccba;
   padding: 10px;
   border-radius: 10px;
+  border: none;
 }
 
-.controls {
-  display: flex;
-  justify-content: center !important;
-  align-items: center;
-  gap: 20px;
+/* IMPORT */
+#importBtn {
+  margin: 10px;
+  background: black;
+  color: white;
+}
 
-  width: 100%;
+/* RECORD */
+#recordingIndicator {
+  width: 12px;
+  height: 12px;
+  background: red;
+  border-radius: 50%;
+  display: none;
+}
+
+/* BUTTONS INIT STATE */
+#downloadBtn,
+#uploadBtn {
+  display: none;
   margin: 20px auto;
 }
 
-.left,
-.right {
-  flex: 0 0 auto !important;  /* empêche étirement */
-  width: auto !important;
-}
+/* MOBILE */
+@media (max-width: 600px) {
+  h1 { font-size: 20px; }
 
-.right {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-items: center;
-}
+  .controls {
+    flex-direction: column;
+    align-items: center;
+  }
 
-#importBtn {
-  margin: 10px;
+  button {
+    width: 80%;
+  }
 }
