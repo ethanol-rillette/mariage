@@ -141,7 +141,7 @@ button {
 
   /* caméra prend presque tout l'écran */
   .preview-box,
-  #previewContainer {
+  #preview {
     width: 95vw;
   }
 
