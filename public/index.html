@@ -53,6 +53,9 @@
 <canvas id="canvas" style="display:none;"></canvas>
 <input type="hidden" id="uploader" value="Nathan">
 
+<!-- message envoyé -->
+<div id="toast"></div>
+
 <script>
 
 let stream;
@@ -243,8 +246,18 @@ document.getElementById("uploadBtn").onclick = async () => {
     });
 
     if (res.ok) {
-      alert("Envoyé !");
+      showToast("Envoyé !");
+
+      // reset preview
+      const preview = document.getElementById("preview");
+      preview.innerHTML = "";
+
       document.getElementById("previewContainer").style.display = "none";
+
+      // reset data
+      lastData = null;
+      lastType = null;
+
       hideButtons();
     } else {
       alert("Erreur upload");
@@ -253,6 +266,16 @@ document.getElementById("uploadBtn").onclick = async () => {
   } catch (err) {
     alert("Erreur serveur");
   }
+};
+
+function showToast(message) {
+  const toast = document.getElementById("toast");
+  toast.innerText = message;
+  toast.style.display = "block";
+
+  setTimeout(() => {
+    toast.style.display = "none";
+  }, 2000);
 };
 
 // =======================
