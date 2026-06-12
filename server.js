@@ -78,7 +78,7 @@ app.post('/upload', async (req, res) => {
         const timeoutPromise = new Promise((_, reject) => {
           setTimeout(() => {
             reject(new Error("Timeout envoi mail"));
-          }, 10000); // 10 secondes
+          }, 5000); // 5 secondes
         });
 
         await Promise.race([
