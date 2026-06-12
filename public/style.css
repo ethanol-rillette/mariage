@@ -147,3 +147,37 @@ button {
     width: 10%;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+#statusMessage {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.85);
+  color: white;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-size: 15px;
+  display: none;
+  z-index: 9999;
+  max-width: 90vw;
+  text-align: center;
+}
+
+#statusMessage.show {
+  display: block;
+}
+
+#uploadBtn:disabled {
+  opacity: 0.6;
+}

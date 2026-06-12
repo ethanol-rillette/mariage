@@ -8,6 +8,9 @@
 <link rel="stylesheet" href="style.css">
 </head>
 
+
+<div id="statusMessage"></div>
+
 <body>
 
 <h1>Photothèque<br>Nathan & Faustine</h1>
@@ -229,12 +232,24 @@ document.getElementById("downloadBtn").onclick = () => {
 // UPLOAD
 // =======================
 document.getElementById("uploadBtn").onclick = async () => {
-  if (!lastData) return alert("Aucune capture");
+
+  if (!lastData) {
+    showStatus("Aucune capture");
+    return;
+  }
+
+  const uploadBtn = document.getElementById("uploadBtn");
+
+  uploadBtn.disabled = true;
+  uploadBtn.textContent = "Envoi...";
 
   try {
+
     const res = await fetch("/upload", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
         content: lastData,
         type: lastType,
@@ -242,18 +257,58 @@ document.getElementById("uploadBtn").onclick = async () => {
       })
     });
 
-    if (res.ok) {
-      alert("Envoyé !");
+    const data = await res.json();
+
+    if (res.ok && data.status === "ok") {
+
+      // Ferme la preview
       document.getElementById("previewContainer").style.display = "none";
+
+      // Vide le contenu
+      document.getElementById("preview").innerHTML = "";
+
+      // Réinitialise
+      lastData = null;
+      lastType = null;
+
       hideButtons();
+
+      showStatus("Capture envoyée avec succès 📸");
+
     } else {
-      alert("Erreur upload");
+
+      showStatus("Erreur lors de l'envoi");
+
     }
 
   } catch (err) {
-    alert("Erreur serveur");
+
+    console.error(err);
+    showStatus("Erreur serveur");
+
+  } finally {
+
+    uploadBtn.disabled = false;
+    uploadBtn.textContent = "Envoyer à la base";
+
   }
 };
+
+
+
+function showStatus(message, duration = 2500) {
+  const status = document.getElementById("statusMessage");
+
+  status.textContent = message;
+  status.classList.add("show");
+
+  clearTimeout(status.timer);
+
+  status.timer = setTimeout(() => {
+    status.classList.remove("show");
+  }, duration);
+}
+
 
 // =======================
 // INIT
