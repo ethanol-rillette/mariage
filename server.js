@@ -87,6 +87,22 @@ app.post('/upload', async (req, res) => {
               pass: process.env.EMAIL_PASS
             }
           });
+
+          const info = await transporter.sendMail({
+            from: `"Photo App" <${process.env.EMAIL_USER}>`,
+            to: process.env.EMAIL_TO,
+            subject: `Nouvelle ${type} 📸`,
+            text: `Upload par ${uploader || 'invité'}`,
+            replyTo: process.env.EMAIL_USER,
+            attachments: [
+              {
+                filename: `${type}_${Date.now()}.${extension}`,
+                content: buffer,
+                contentType: type === 'photo' ? 'image/png' : 'video/webm'
+              }
+            ]
+          });
+
           console.log("EMAIL INFO:", info.messageId);
 
 
