@@ -87,7 +87,7 @@ app.post('/upload', async (req, res) => {
           setTimeout(() => {
             console.log("timeout déclenché")
             reject(new Error("Timeout envoi mail"));
-          }, 5000);
+          }, 30000);
         });
 
         console.log("avant Promise.race")
