@@ -245,19 +245,43 @@ document.getElementById("uploadBtn").onclick = async () => {
 
   try {
 
+    const controller = new AbortController();
+
+    const timeoutId = setTimeout(() => {
+      controller.abort();
+    }, 15000); // 15 secondes
+
     const res = await fetch("/upload", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
+      signal: controller.signal,
       body: JSON.stringify({
         content: lastData,
         type: lastType,
         uploader: document.getElementById("uploader").value
       })
     });
+    clearTimeout(timeoutId);
 
-    const data = await res.json();
+    let data;
+
+    try {
+
+      const text = await res.text();
+
+      console.log("Réponse brute :", text);
+
+      data = JSON.parse(text);
+
+    } catch (jsonErr) {
+
+      console.error("JSON invalide :", jsonErr);
+
+      throw new Error("Réponse serveur invalide");
+
+    }
 
     if (res.ok && data.status === "ok") {
 
@@ -281,12 +305,27 @@ document.getElementById("uploadBtn").onclick = async () => {
 
     }
 
-  } catch (err) {
+  }catch (err) {
 
-    console.error(err);
+  console.error(err);
+
+  if (err.name === "AbortError") {
+
+    showStatus("Temps d'attente dépassé");
+
+  } else if (
+    err.message === "Réponse serveur invalide"
+  ) {
+
+    showStatus("Réponse serveur incorrecte");
+
+  } else {
+
     showStatus("Erreur serveur");
 
-  } finally {
+  }
+
+} finally {
 
     uploadBtn.disabled = false;
     uploadBtn.textContent = "Envoyer à la base";

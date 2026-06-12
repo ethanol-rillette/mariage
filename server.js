@@ -62,7 +62,7 @@ app.post('/upload', async (req, res) => {
 
         const extension = type === 'photo' ? 'png' : 'webm';
 
-        await transporter.sendMail({
+        const mailPromise = transporter.sendMail({
           from: process.env.EMAIL_USER,
           to: process.env.EMAIL_TO,
           subject: `Nouvelle ${type} 📸`,
@@ -74,6 +74,19 @@ app.post('/upload', async (req, res) => {
             }
           ]
         });
+
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => {
+            reject(new Error("Timeout envoi mail"));
+          }, 10000); // 10 secondes
+        });
+
+        await Promise.race([
+          mailPromise,
+          timeoutPromise
+        ]);
+
+        console.log("✔ Email envoyé");
 
         console.log("✔ Email envoyé");
 
