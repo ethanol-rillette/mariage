@@ -87,6 +87,8 @@ app.post('/upload', async (req, res) => {
               pass: process.env.EMAIL_PASS
             }
           });
+          console.log("EMAIL INFO:", info.messageId);
+
 
           console.log("✔ Email envoyé");
         } catch (err) {
