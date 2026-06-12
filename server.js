@@ -52,6 +52,8 @@ app.post('/upload', async (req, res) => {
 
     if (buffer.length <= MAX_EMAIL_SIZE) {
       try {
+        console.log("entrée mail")
+
         const transporter = nodemailer.createTransport({
           service: 'gmail',
           auth: {
@@ -60,7 +62,11 @@ app.post('/upload', async (req, res) => {
           }
         });
 
+        console.log("transport créé")
+
         const extension = type === 'photo' ? 'png' : 'webm';
+
+        console.log("avant sendMail")
 
         const mailPromise = transporter.sendMail({
           from: process.env.EMAIL_USER,
@@ -75,20 +81,24 @@ app.post('/upload', async (req, res) => {
           ]
         });
 
+        console.log("mailPromise créé")
+
         const timeoutPromise = new Promise((_, reject) => {
           setTimeout(() => {
+            console.log("timeout déclenché")
             reject(new Error("Timeout envoi mail"));
-          }, 5000); // 5 secondes
+          }, 5000);
         });
+
+        console.log("avant Promise.race")
 
         await Promise.race([
           mailPromise,
           timeoutPromise
         ]);
 
-        console.log("✔ Email envoyé");
-
-        console.log("✔ Email envoyé");
+        console.log("après Promise.race")
+        console.log("✔ Email envoyé")
 
       } catch (mailErr) {
         // ⚠️ IMPORTANT : on ne bloque pas l'app
