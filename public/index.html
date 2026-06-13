@@ -37,7 +37,7 @@
 
 <!-- IMPORT -->
 <input type="file" id="fileInput" accept="image/*,video/*" hidden>
-<button id="importBtn" onclick="fileInput.click()">Importer</button>
+<button id="importBtn">Importer</button>
 
 <!-- PREVIEW -->
 <div id="previewContainer" style="display:none;">
@@ -65,6 +65,32 @@ let lastData = null;
 let lastType = null;
 
 let currentFacingMode = "user";
+
+
+document.getElementById("importBtn").onclick = () => {
+  document.getElementById("fileInput").click();
+};
+
+document.getElementById("fileInput").addEventListener("change", (event) => {
+  const file = event.target.files[0];
+
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    lastData = reader.result;
+
+    lastType =
+      file.type.startsWith("video")
+        ? "video"
+        : "photo";
+
+    showPreview();
+  };
+
+  reader.readAsDataURL(file);
+});
 
 const video = document.getElementById("video");
 
