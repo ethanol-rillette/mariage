@@ -49,6 +49,11 @@ body {
   height: 100%;
 }
 
+#preview video {
+  transform: scaleX(-1);
+}
+
+
 
 /* CONTROLS */
 .controls {
