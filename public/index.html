@@ -217,7 +217,7 @@ function showPreview() {
   if (lastType === "photo") {
     preview.innerHTML = `<img src="${lastData}">`;
   } else {
-    preview.innerHTML = `<video src="${lastData}" autoplay loop muted playsinline></video>`;
+    preview.innerHTML = `<video src="${lastData}" controls autoplay playsinline></video>`;
   }
 
   container.style.display = "block";
