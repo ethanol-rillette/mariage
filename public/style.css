@@ -49,9 +49,6 @@ body {
   height: 100%;
 }
 
-#preview img{
-  transform: scaleX(-1);
-}
 
 /* CONTROLS */
 .controls {
